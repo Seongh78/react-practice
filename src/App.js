@@ -1,55 +1,68 @@
 import React, { Component } from 'react';
 import Navbar from './layouts/Navbar';
+// import Button from './components/Button';
+
+// 리액트부트스트랩 컴포넌트
+import { 
+  Button,
+  Modal, 
+  ModalHeader, 
+  ModalBody, 
+  ModalFooter
+} from 'reactstrap';
 
 class App extends Component {
 
   constructor(props) {
     super(props);
-
-    
-
   }
 
   state = {
     findList: [],
+    isActive: -1,
+    keyword: '',
+    toggleModal: false,
     inputUser: {
       name: '',
       phone: '',
-      belong: 'Douzone',
-      img: 'http://git.duzon.com/uploads/-/system/user/avatar/17/untitled.png'
+      belong: '',
+      img: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
     },
     contact: [
       {
         id: 1,
         name : 'David Lee', 
         phone: '010-2222-3333',
-        belong: 'Douzone',
+        belong: '더존비즈온',
         img: 'http://git.duzon.com/uploads/-/system/user/avatar/17/untitled.png'
       },
       {
         id: 2,
         name : 'John Lee', 
         phone: '010-3333-4444',
-        belong: 'Douzone',
+        belong: '키컴',
         img: 'http://wiki.duzon.com:8080/download/attachments/28727800/user-avatar?version=1&modificationDate=1541550362871&api=v2'
       },
       {
         id: 3,
         name : 'James Kim', 
         phone: '010-4444-5555',
-        belong: 'Douzone',
+        belong: '더존차이나',
         img: 'http://wiki.duzon.com:8080/download/attachments/28727838/user-avatar?version=2&modificationDate=1541568530195&api=v2'
       },
     ]
   } // state
 
   render() {
-    const { 
+    let { 
       contact, 
       findList,
-      inputUser
+      keyword,
+      inputUser,
+      isActive,
+      toggleModal
     } = this.state
-    if(findList.length>0){
+    if(keyword){
       contact = findList.slice()
     }
 
@@ -58,56 +71,92 @@ class App extends Component {
         {/* 네비바 */}
         <Navbar appName="연락처" />
 
-
+        
+        
         <ul className="list-group list-group-flush">
-          {contact.map(pp=>
-            <li 
-              className="list-group-item d-flex justify-content-between align-items-center" 
-              key={pp.id}
-              onClick={()=>this.profileDetailView(pp.id)}
-            >
-              <span>
-              <img width="30" className="img-circle" src={pp.img} />&nbsp;&nbsp;
-              {pp.name}
-              </span>
-              <small>{pp.phone}</small>
-            </li>
+          <li className="list-group-item d-flex justify-content-between align-items-center">
+            <input 
+              className="form-control my-1" 
+              type="search" 
+              placeholder="Search" 
+              aria-label="Search"
+              value={keyword}
+              onChange={this._handleFindUser}
+            />
+          </li>
+          {(contact.length<1) 
+            ? <li 
+                className="list-group-item d-flex justify-content-between align-items-center" 
+              >
+              <small>연락처가 없습니다.</small>
+              </li>
+            : ''
+          }
+          {contact.map((pp, index)=>
+            <div key={index}>
+              <li 
+                className="list-group-item d-flex justify-content-between align-items-center" 
+                onClick={()=>this.profileDetailView(index)}
+              >
+                <span>
+                <img width="30" height="30.5" className="img-circle" src={pp.img} />&nbsp;&nbsp;
+                {pp.name}
+                </span>
+                {/* <small>{pp.phone}</small> */}
+                
+              </li>
+              {(index === isActive) 
+                ? 
+                <li className="list-group-item">
+                  연락처: {pp.phone} <br/>
+                  소속: {pp.belong} <br/>
+                  <p>
+                    <button type="button" className="btn btn-primary btn-sm">수정</button>
+                    <button type="button" className="btn btn-danger btn-sm" onClick={()=>{ this._handleRemove(index) }}>삭제</button>
+                  </p>
+                </li>
+                : ''
+              }
+            </div>
           )}
           
-          {/* 추가버튼 */}
+        
+
           <li className="list-group-item d-flex justify-content-between align-items-center">
-            <form>
-              <div className="row">
-                <div className="col">
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Name" 
-                    value={inputUser.name} 
-                  />
-                </div>
-                <div className="col">
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Phone" 
-                    value={inputUser.phone} 
-                  />
-                </div>
-              </div>
-            </form>
-          </li>
-          <li className="list-group-item d-flex justify-content-between align-items-center">
-            <button 
-              type="button" 
-              className="btn btn-primary btn-md btn-block"
-              onClick={this._handleCreateItem}
+            <Button 
+              className="btn-block"
+              color="primary"
+              onClick={this._toggle}
             >
-              Add +
-            </button>
+              Add +  
+            </Button>
           </li>
         </ul>
 
+        {/* 모달 */}
+        <Modal isOpen={this.state.toggleModal} toggle={this._toggle}>
+          <ModalHeader toggle={this._toggle}>신규 연락처</ModalHeader>
+          <ModalBody>
+          <form>
+            <div className="form-group">
+              <label>이름</label>
+              <input type="text" className="form-control" name="name" value={inputUser.name} onChange={this._handleInsert} />
+            </div>
+            <div className="form-group">
+              <label>연락처</label>
+              <input type="text" className="form-control" name="phone" value={inputUser.phone} onChange={this._handleInsert} />
+            </div>
+            <div className="form-group">
+              <label>소속</label>
+              <input type="text" className="form-control" name="belong" value={inputUser.belong} onChange={this._handleInsert} />
+            </div>
+          </form>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onClick={this._handleCreateItem}>확인</Button>{' '}
+            <Button color="secondary" onClick={this._toggle}>취소</Button>
+          </ModalFooter>
+        </Modal>
       </div>
     );
   } // render()
@@ -117,38 +166,93 @@ class App extends Component {
    * 클릭 이벤트 
    * - 선택한 사람의 정보출력
    */
-  profileDetailView = (userId)=>{
-    const { contact } = this.state;
-    alert(JSON.stringify(contact.filter(user => {return user.id===userId})[0]))
+  profileDetailView = (index)=>{
+    const { isActive } = this.state;
+    index = index === isActive ? -1 : index
+    this.setState({
+      isActive : index
+    })
   } // profileDetailView
+
 
   /*
    * 검색 
    */
-  findUser = (name)=>{
-    const { contact } = this.state;
+  _handleFindUser = (e)=>{
+    const { contact, keyword } = this.state;
+    
     const findList = contact.filter(user=>{
-      return user.name === name;
+      return user.name.match(e.target.value) || user.phone.match(e.target.value);
     })
-    this.setState({findList})
+    const initData = {
+      id: null,
+      name: '',
+      phone: '',
+      belong: '',
+      img: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+    }
+    this.setState({
+      keyword: e.target.value,
+      findList,
+      inputUser: initData 
+    })
+    
   } // profileDetailView
+
+
+  /**
+   * 모달 토글
+   */
+  _toggle = ()=>{
+    this.setState({
+      toggleModal : !this.state.toggleModal
+    })
+    return;
+  }
+
+
+  /**
+   * 유저데이터 입력
+   */
+  _handleInsert = (e) => {
+    let usr = this.state.inputUser;
+    usr[e.target.name] = e.target.value;
+    this.setState({ inputUser: usr })
+  }
+
 
   /**
    * 유저추가
    */
   _handleCreateItem = ()=>{
-    let list = this.state.contact.slice()
-    list.push({
-      id: Number(list[list.length-1].id)+1,
-      name : 'James Kim', 
-      phone: '010-4444-5555',
-      belong: 'Douzone',
-      img: 'http://wiki.duzon.com:8080/download/attachments/28727838/user-avatar?version=2&modificationDate=1541568530195&api=v2'
-    })
+    let { contact, inputUser } = this.state;
+    let list = contact.slice()
+
+    inputUser.id = list[list.length-1].id + 1
+    console.log(inputUser);
+    
+    list.push(inputUser)
+
     this.setState({
       contact : list
     })
-  }
+
+    this.setState({
+      toggleModal : !this.state.toggleModal
+    }) 
+  }// _handleCreateItem
+
+  /**
+   * 유저삭제
+   */
+  _handleRemove = (index) => {
+    if ( !window.confirm('해당 연락처를 삭제하시겠습니까?') ){ 
+      return; 
+    }
+    const { contact } = this.state;
+    contact.splice(index, 1);
+    this.setState({contact, isActive:-1});
+  }// _handleRemove
 
 }
 

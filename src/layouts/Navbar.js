@@ -15,20 +15,10 @@ class Navbar extends Component {
 
         return(
             <nav className="navbar navbar-light bg-light">
-                <a className="navbar-brand">
-                    &nbsp;&nbsp;{appName}
+                <a href="/#/" className="navbar-brand">
+                    &nbsp;{appName}
                 </a>
-                <form className="form-inline">
-                <input 
-                    className="form-control mr-sm-2" 
-                    type="search" 
-                    placeholder="Search" 
-                    aria-label="Search"
-                    // value={findName}
-                    // onKeyUp={()=>{ this.findUser() }}
-                >
-                </input>
-                </form>
+                
             </nav>
         )// return 
     } // render 
