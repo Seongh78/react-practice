@@ -18,7 +18,6 @@ class Navbar extends Component {
                 <a href="/#/" className="navbar-brand">
                     &nbsp;{appName}
                 </a>
-                
             </nav>
         )// return 
     } // render 

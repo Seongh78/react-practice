@@ -292,7 +292,6 @@ class App extends Component {
       phone: {
         value: '',
         regExp: /^\d{3}-\d{3,4}-\d{4}$/
-        // regExp: /^[0-9]*^/ 
       },
       belong: {
         value: '',
