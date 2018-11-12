@@ -15,7 +15,7 @@ import {
 const initData = {
   name: {
     value: '',
-    regExp: /[a-zA-Z|가-힣]/
+    regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
   },
   phone: {
     value: '',
@@ -52,7 +52,26 @@ class App extends Component {
     // 모달토글
     toggleModal: false,
     // 유저입력데이터
-    inputUser: initData,
+    inputUser: {
+      name: {
+        value: '',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      },
+      phone: {
+        value: '',
+        regExp: /^\d{3}-\d{3,4}-\d{4}$/
+        // regExp: /^[0-9]*^/ 
+      },
+      belong: {
+        value: '',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      },
+      img: {
+        value: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      }
+      
+    },
     // 연락처 리스트
     contact: [
       {
@@ -349,13 +368,15 @@ class App extends Component {
         img:    inputUser.img.value
       })
     }
-
+    console.log(initData);
+    
     // 데이터 변경
     this.setState({
       contact:      list,
       inputUser:    initData,
       toggleModal:  !toggleModal
     }) 
+    delete inputUser.id;
   }
 
 
