@@ -24,17 +24,21 @@ class App extends Component {
     isActive: -1,
     // 검색어
     keyword: '',
+    // 모달타이틀
+    modalTitle: '',
     // 모달토글
     toggleModal: false,
     // 유저입력데이터
     inputUser: {
       name: {
         value: '',
-        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+        // regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+        regExp: /[a-zA-Z|가-힣]/
       },
       phone: {
         value: '',
-        regExp: /^[0-9]*^/ 
+        regExp: /^\d{3}-\d{3,4}-\d{4}$/
+        // regExp: /^[0-9]*^/ 
       },
       belong: {
         value: '',
@@ -94,19 +98,27 @@ class App extends Component {
 
         {/* 리스트 */}
         <ul className="list-group list-group-flush">
-          {/* 검색바 */}
+          {/* 검색 */}
           <li className="list-group-item d-flex justify-content-between align-items-center">
-            <input 
-              className="form-control my-1" 
-              type="search" 
-              placeholder="Search" 
-              aria-label="Search"
-              value={keyword}
-              onChange={this._handleFindUser}
-            />
+            <div className="input-group">
+              {/* 검색바 */}
+              <input 
+                type="text" 
+                className="form-control" 
+                placeholder="Search"
+                value={keyword}
+                onChange={this._handleFindUser}
+              />
+              {/* Clear 버튼 */}
+              <div className="input-group-append">
+                <button className="btn btn-outline-danger" onClick={this._handleKeywordClear}>X</button>
+              </div>
+            </div>
+
           </li>
           {/* 검색결과가 없을 경우 */}
-          {(contact.length<1) 
+          {
+            (contact.length<1) 
             ? <li 
                 className="list-group-item d-flex justify-content-between align-items-center" 
               >
@@ -115,7 +127,8 @@ class App extends Component {
             : ''
           }
           {/* 리스트 출력 */}
-          {contact.map((pp, index)=>
+          {
+            contact.map((pp, index)=>
             <div key={index}>
               <li 
                 className="list-group-item d-flex justify-content-between align-items-center" 
@@ -134,14 +147,15 @@ class App extends Component {
                   연락처: {pp.phone} <br/>
                   소속: {pp.belong} <br/>
                   <p>
-                    <button type="button" className="btn btn-primary btn-sm">수정</button>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={()=>{ this._handleUpdateContact(pp.id) }}>수정</button>
                     <button type="button" className="btn btn-danger btn-sm" onClick={()=>{ this._handleRemoveContact(index) }}>삭제</button>
                   </p>
                 </li>
                 : ''
               }
             </div>
-          )}
+            )
+          }
           
           {/* 추가버튼 */}
           <li className="list-group-item d-flex justify-content-between align-items-center">
@@ -157,7 +171,7 @@ class App extends Component {
 
         {/* 모달 */}
         <Modal isOpen={this.state.toggleModal} toggle={this._toggle}>
-          <ModalHeader toggle={this._toggle}>신규 연락처</ModalHeader>
+          <ModalHeader toggle={this._toggle}>연락처</ModalHeader>
           <ModalBody>
           <form>
             <div className="form-group">
@@ -195,6 +209,18 @@ class App extends Component {
     index = index === isActive ? -1 : index
     this.setState({
       isActive : index
+    })
+  }
+
+
+  /** ------------------------------
+   * 검색창 초기화 
+   * -------------------------------
+   * 검색창 입력내용 초기화
+   */
+  _handleKeywordClear = ()=>{
+    this.setState({
+      keyword : ''
     })
   }
 
@@ -252,7 +278,11 @@ class App extends Component {
    * inputUser에 데이터를 메인 모델로 추가
    */
   _handleCreateContact = ()=>{
-    let { contact, inputUser, inputUser2 } = this.state;
+    let { 
+      contact, //연락처
+      inputUser, //입력데이터
+      toggleModal //모달토글
+    } = this.state;
     let list = contact.slice() // 리스트 복사
     const initData = {
       name: {
@@ -261,7 +291,8 @@ class App extends Component {
       },
       phone: {
         value: '',
-        regExp: /^[0-9]*^/ 
+        regExp: /^\d{3}-\d{3,4}-\d{4}$/
+        // regExp: /^[0-9]*^/ 
       },
       belong: {
         value: '',
@@ -272,33 +303,71 @@ class App extends Component {
         regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
       }
     }
-    
-    // 입력 예외처리
-    const confirmList = Object.values(inputUser)
-    for(var item of confirmList){
-      if(!item.regExp.test(item.value) || !item.value){
-        alert('입력오류!!');
-        return;
-      }
+
+    // 예외검사
+    if(
+      !inputUser.name.regExp.test(inputUser.name.value) || !inputUser.name.value ||
+      !inputUser.phone.regExp.test(inputUser.phone.value) || !inputUser.phone.value ||
+      !inputUser.belong.regExp.test(inputUser.belong.value) || !inputUser.belong.value 
+    ){
+      return alert('입력오류!!');
     }
-    
-    // id 만들기 (리스트 마지막 아이디+1)
-    inputUser.id = list[list.length-1].id + 1
-    // 메인모델로 푸시
-    list.push({
-      id:     inputUser.id,
-      name:   inputUser.name.value,
-      phone:  inputUser.phone.value,
-      belong: inputUser.belong.value,
-      img:    inputUser.img.value
-    })
+
+    // 업데이트일경우
+    if(inputUser.id){
+      const findIndex = list.findIndex(item=>{
+        return inputUser.id === item.id
+      })
+      // 수정된 정보 반영
+      list[findIndex].name = inputUser.name.value
+      list[findIndex].phone = inputUser.phone.value
+      list[findIndex].belong = inputUser.belong.value
+    }
+    // 신규일경우
+    else{
+      // id 만들기 (리스트 마지막 아이디+1)
+      inputUser.id = list[list.length-1].id + 1
+      // 메인모델로 푸시
+      list.push({
+        id:     inputUser.id,
+        name:   inputUser.name.value,
+        phone:  inputUser.phone.value,
+        belong: inputUser.belong.value,
+        img:    inputUser.img.value
+      })
+    }
 
     // 데이터 변경
     this.setState({
       contact:      list,
       inputUser:    initData,
-      toggleModal:  !this.state.toggleModal
+      toggleModal:  !toggleModal
     }) 
+  }
+
+
+  /** ------------------------------
+   * 업데이트
+   * -------------------------------
+   * -
+   */
+  _handleUpdateContact = (id) => {
+    const { toggleModal, inputUser, contact } = this.state;
+    // 아이디 찾기
+    const findIndex = contact.findIndex(item=>{
+      return item.id === id
+    })
+    
+    inputUser.id = contact[findIndex].id
+    inputUser.name.value = contact[findIndex].name
+    inputUser.phone.value = contact[findIndex].phone
+    inputUser.belong.value = contact[findIndex].belong
+    
+    // 데이터변경
+    this.setState({
+      inputUser,
+      toggleModal: !toggleModal
+    })
   }
 
 
