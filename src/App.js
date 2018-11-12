@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Navbar from './layouts/Navbar';
-// import Button from './components/Button';
 
 // 리액트부트스트랩 컴포넌트
 import { 
@@ -10,6 +9,30 @@ import {
   ModalBody, 
   ModalFooter
 } from 'reactstrap';
+
+
+
+const initData = {
+  name: {
+    value: '',
+    regExp: /[a-zA-Z|가-힣]/
+  },
+  phone: {
+    value: '',
+    regExp: /^\d{3}-\d{3,4}-\d{4}$/
+    // regExp: /^[0-9]*^/ 
+  },
+  belong: {
+    value: '',
+    regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+  },
+  img: {
+    value: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
+    regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+  }
+  
+}
+
 
 class App extends Component {
 
@@ -29,27 +52,7 @@ class App extends Component {
     // 모달토글
     toggleModal: false,
     // 유저입력데이터
-    inputUser: {
-      name: {
-        value: '',
-        // regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
-        regExp: /[a-zA-Z|가-힣]/
-      },
-      phone: {
-        value: '',
-        regExp: /^\d{3}-\d{3,4}-\d{4}$/
-        // regExp: /^[0-9]*^/ 
-      },
-      belong: {
-        value: '',
-        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
-      },
-      img: {
-        value: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
-        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
-      }
-      
-    },
+    inputUser: initData,
     // 연락처 리스트
     contact: [
       {
@@ -111,7 +114,7 @@ class App extends Component {
               />
               {/* Clear 버튼 */}
               <div className="input-group-append">
-                <button className="btn btn-outline-danger" onClick={this._handleKeywordClear}>X</button>
+                <button className="btn" onClick={this._handleKeywordClear}>X</button>
               </div>
             </div>
 
@@ -284,24 +287,7 @@ class App extends Component {
       toggleModal //모달토글
     } = this.state;
     let list = contact.slice() // 리스트 복사
-    const initData = {
-      name: {
-        value: '',
-        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
-      },
-      phone: {
-        value: '',
-        regExp: /^\d{3}-\d{3,4}-\d{4}$/
-      },
-      belong: {
-        value: '',
-        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
-      },
-      img: {
-        value: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
-        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
-      }
-    }
+    
 
     // 예외검사
     if(
