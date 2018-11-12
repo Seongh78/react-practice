@@ -18,16 +18,35 @@ class App extends Component {
   }
 
   state = {
+    // 검색목록
     findList: [],
+    // 선택유저
     isActive: -1,
+    // 검색어
     keyword: '',
+    // 모달토글
     toggleModal: false,
+    // 유저입력데이터
     inputUser: {
-      name: '',
-      phone: '',
-      belong: '',
-      img: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+      name: {
+        value: '',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      },
+      phone: {
+        value: '',
+        regExp: /^[0-9]*^/ 
+      },
+      belong: {
+        value: '',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      },
+      img: {
+        value: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      }
+      
     },
+    // 연락처 리스트
     contact: [
       {
         id: 1,
@@ -62,6 +81,8 @@ class App extends Component {
       isActive,
       toggleModal
     } = this.state
+    
+    // 검색인경우
     if(keyword){
       contact = findList.slice()
     }
@@ -71,9 +92,9 @@ class App extends Component {
         {/* 네비바 */}
         <Navbar appName="연락처" />
 
-        
-        
+        {/* 리스트 */}
         <ul className="list-group list-group-flush">
+          {/* 검색바 */}
           <li className="list-group-item d-flex justify-content-between align-items-center">
             <input 
               className="form-control my-1" 
@@ -84,6 +105,7 @@ class App extends Component {
               onChange={this._handleFindUser}
             />
           </li>
+          {/* 검색결과가 없을 경우 */}
           {(contact.length<1) 
             ? <li 
                 className="list-group-item d-flex justify-content-between align-items-center" 
@@ -92,11 +114,12 @@ class App extends Component {
               </li>
             : ''
           }
+          {/* 리스트 출력 */}
           {contact.map((pp, index)=>
             <div key={index}>
               <li 
                 className="list-group-item d-flex justify-content-between align-items-center" 
-                onClick={()=>this.profileDetailView(index)}
+                onClick={()=>this._handleClickProfile(index)}
               >
                 <span>
                 <img width="30" height="30.5" className="img-circle" src={pp.img} />&nbsp;&nbsp;
@@ -112,7 +135,7 @@ class App extends Component {
                   소속: {pp.belong} <br/>
                   <p>
                     <button type="button" className="btn btn-primary btn-sm">수정</button>
-                    <button type="button" className="btn btn-danger btn-sm" onClick={()=>{ this._handleRemove(index) }}>삭제</button>
+                    <button type="button" className="btn btn-danger btn-sm" onClick={()=>{ this._handleRemoveContact(index) }}>삭제</button>
                   </p>
                 </li>
                 : ''
@@ -120,8 +143,7 @@ class App extends Component {
             </div>
           )}
           
-        
-
+          {/* 추가버튼 */}
           <li className="list-group-item d-flex justify-content-between align-items-center">
             <Button 
               className="btn-block"
@@ -140,23 +162,24 @@ class App extends Component {
           <form>
             <div className="form-group">
               <label>이름</label>
-              <input type="text" className="form-control" name="name" value={inputUser.name} onChange={this._handleInsert} />
+              <input type="text" className="form-control" name="name" value={inputUser.name.value} onChange={this._handleChangeValue} />
             </div>
             <div className="form-group">
               <label>연락처</label>
-              <input type="text" className="form-control" name="phone" value={inputUser.phone} onChange={this._handleInsert} />
+              <input type="text" className="form-control" name="phone" value={inputUser.phone.value} onChange={this._handleChangeValue} />
             </div>
             <div className="form-group">
               <label>소속</label>
-              <input type="text" className="form-control" name="belong" value={inputUser.belong} onChange={this._handleInsert} />
+              <input type="text" className="form-control" name="belong" value={inputUser.belong.value} onChange={this._handleChangeValue} />
             </div>
           </form>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={this._handleCreateItem}>확인</Button>{' '}
+            <Button color="primary" onClick={this._handleCreateContact}>확인</Button>{' '}
             <Button color="secondary" onClick={this._toggle}>취소</Button>
           </ModalFooter>
         </Modal>
+
       </div>
     );
   } // render()
@@ -167,41 +190,13 @@ class App extends Component {
    * -------------------------------
    * 선택한 사람의 정보출력
    */
-  profileDetailView = (index)=>{
+  _handleClickProfile = (index)=>{
     const { isActive } = this.state;
     index = index === isActive ? -1 : index
     this.setState({
       isActive : index
     })
   }
-
-
-  /** ------------------------------
-   * 검색 
-   * -------------------------------
-   * 
-   */
-  _handleFindUser = (e)=>{
-    const { contact, keyword } = this.state;
-    // 검색
-    const findList = contact.filter(user=>{
-      // 아이디 또는 번호에 일치하는 결과가 있는 경우 리턴
-      return user.name.match(e.target.value) || user.phone.match(e.target.value);
-    })
-    const initData = {
-      id: null,
-      name: '',
-      phone: '',
-      belong: '',
-      img: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
-    }
-    this.setState({
-      keyword: e.target.value,
-      findList,
-      inputUser: initData 
-    })
-    
-  } // profileDetailView
 
 
   /** ------------------------------
@@ -218,13 +213,35 @@ class App extends Component {
 
 
   /** ------------------------------
+   * 검색 
+   * -------------------------------
+   * 
+   */
+  _handleFindUser = (e)=>{
+    const { contact, keyword } = this.state;
+    // 검색
+    const findList = contact.filter(user=>{
+      // 아이디 또는 번호에 일치하는 결과가 있는 경우 리턴
+      return user.name.match(e.target.value) || user.phone.match(e.target.value);
+    })
+    
+    // 데이터 변경
+    this.setState({
+      keyword: e.target.value,
+      findList,
+    })
+    
+  } 
+
+
+  /** ------------------------------
    * 유저데이터 입력
    * -------------------------------
-   * 인풋에 입력시 
+   * 인풋에 입력시 데이터 바인딩
    */
-  _handleInsert = (e) => {
+  _handleChangeValue = (e) => {
     let usr = this.state.inputUser;
-    usr[e.target.name] = e.target.value;
+    usr[e.target.name].value = e.target.value;
     this.setState({ inputUser: usr })
   }
 
@@ -234,18 +251,53 @@ class App extends Component {
    * -------------------------------
    * inputUser에 데이터를 메인 모델로 추가
    */
-  _handleCreateItem = ()=>{
-    let { contact, inputUser } = this.state;
+  _handleCreateContact = ()=>{
+    let { contact, inputUser, inputUser2 } = this.state;
     let list = contact.slice() // 리스트 복사
-
+    const initData = {
+      name: {
+        value: '',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      },
+      phone: {
+        value: '',
+        regExp: /^[0-9]*^/ 
+      },
+      belong: {
+        value: '',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      },
+      img: {
+        value: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
+        regExp: /[a-zA-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/
+      }
+    }
+    
+    // 입력 예외처리
+    const confirmList = Object.values(inputUser)
+    for(var item of confirmList){
+      if(!item.regExp.test(item.value) || !item.value){
+        alert('입력오류!!');
+        return;
+      }
+    }
+    
     // id 만들기 (리스트 마지막 아이디+1)
     inputUser.id = list[list.length-1].id + 1
-    list.push(inputUser)
+    // 메인모델로 푸시
+    list.push({
+      id:     inputUser.id,
+      name:   inputUser.name.value,
+      phone:  inputUser.phone.value,
+      belong: inputUser.belong.value,
+      img:    inputUser.img.value
+    })
 
     // 데이터 변경
     this.setState({
-      contact: list,
-      toggleModal: !this.state.toggleModal
+      contact:      list,
+      inputUser:    initData,
+      toggleModal:  !this.state.toggleModal
     }) 
   }
 
@@ -255,7 +307,7 @@ class App extends Component {
    * -------------------------------
    * -
    */
-  _handleRemove = (index) => {
+  _handleRemoveContact = (index) => {
     if ( !window.confirm('해당 연락처를 삭제하시겠습니까?') ) { 
       return; 
     }
