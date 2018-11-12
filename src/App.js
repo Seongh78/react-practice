@@ -162,9 +162,10 @@ class App extends Component {
   } // render()
 
 
-  /*
+  /** ------------------------------
    * 클릭 이벤트 
-   * - 선택한 사람의 정보출력
+   * -------------------------------
+   * 선택한 사람의 정보출력
    */
   profileDetailView = (index)=>{
     const { isActive } = this.state;
@@ -172,16 +173,19 @@ class App extends Component {
     this.setState({
       isActive : index
     })
-  } // profileDetailView
+  }
 
 
-  /*
+  /** ------------------------------
    * 검색 
+   * -------------------------------
+   * 
    */
   _handleFindUser = (e)=>{
     const { contact, keyword } = this.state;
-    
+    // 검색
     const findList = contact.filter(user=>{
+      // 아이디 또는 번호에 일치하는 결과가 있는 경우 리턴
       return user.name.match(e.target.value) || user.phone.match(e.target.value);
     })
     const initData = {
@@ -200,8 +204,10 @@ class App extends Component {
   } // profileDetailView
 
 
-  /**
+  /** ------------------------------
    * 모달 토글
+   * -------------------------------
+   * 모달 ON/OFF
    */
   _toggle = ()=>{
     this.setState({
@@ -211,8 +217,10 @@ class App extends Component {
   }
 
 
-  /**
+  /** ------------------------------
    * 유저데이터 입력
+   * -------------------------------
+   * 인풋에 입력시 
    */
   _handleInsert = (e) => {
     let usr = this.state.inputUser;
@@ -221,39 +229,41 @@ class App extends Component {
   }
 
 
-  /**
-   * 유저추가
+  /** ------------------------------
+   * 신규 연락처 생성
+   * -------------------------------
+   * inputUser에 데이터를 메인 모델로 추가
    */
   _handleCreateItem = ()=>{
     let { contact, inputUser } = this.state;
-    let list = contact.slice()
+    let list = contact.slice() // 리스트 복사
 
+    // id 만들기 (리스트 마지막 아이디+1)
     inputUser.id = list[list.length-1].id + 1
-    console.log(inputUser);
-    
     list.push(inputUser)
 
+    // 데이터 변경
     this.setState({
-      contact : list
-    })
-
-    this.setState({
-      toggleModal : !this.state.toggleModal
+      contact: list,
+      toggleModal: !this.state.toggleModal
     }) 
-  }// _handleCreateItem
+  }
 
-  /**
+
+  /** ------------------------------
    * 유저삭제
+   * -------------------------------
+   * -
    */
   _handleRemove = (index) => {
-    if ( !window.confirm('해당 연락처를 삭제하시겠습니까?') ){ 
+    if ( !window.confirm('해당 연락처를 삭제하시겠습니까?') ) { 
       return; 
     }
     const { contact } = this.state;
     contact.splice(index, 1);
     this.setState({contact, isActive:-1});
-  }// _handleRemove
+  }
 
-}
+}// class
 
 export default App;
