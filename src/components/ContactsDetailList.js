@@ -20,6 +20,14 @@ class ContactsDetailList extends React.Component {
         }))
     }
 
+    /** 
+     * 삭제
+     * 
+     */
+    handleRemove = selectedId => {
+        this.props.onRemove(selectedId)
+    }
+
     render(){
         const { data } = this.props;
         const { selectedId } = this.state;
@@ -29,6 +37,7 @@ class ContactsDetailList extends React.Component {
                 info={info} 
                 onSelected={this.handleSelected}
                 display={selectedId===info.id ? true : false}
+                onRemove={this.handleRemove}
             />
         ))
 

@@ -88,61 +88,6 @@ class App extends Component {
     ]
   } // state
 
-  render() {
-    let { 
-      contact, 
-      keyword,
-      selectedId,
-      toggleModal,
-      initData
-    } = this.state
-    
-    // 검색
-    if(keyword){
-      contact = contact.filter(user=>{
-        return user.name.match(keyword) || user.phone.match(keyword);
-      })
-    }
-
-    return (
-      <div>
-        {/* 네비바 */}
-        <Navbar appName="연락처" />
-
-        {/* 검색바 */}
-        <SearchForm onSearch={this.handleSearch} />
-
-        {/* 리스트 */}
-        <ContactsDetailList data={contact} />
-          
-        {/* 추가버튼 */}
-        <div className="list-group-item d-flex justify-content-between align-items-center">
-          <Button 
-            className="btn-block"
-            color="primary"
-            onClick={this.handleToggle}
-          >
-            Add +  
-          </Button>
-        </div>
-
-        {/* 모달 */}
-        <Modal isOpen={toggleModal} toggle={this.handleToggle}>
-          <ModalHeader toggle={this.handleToggle}>연락처</ModalHeader>
-          <ModalBody>
-            {/* 입력폼 */}
-            <InputForm 
-              onCreate={this.handleCreateContact} 
-              onCancel={this.handleToggle}  
-              initData={initData}
-            />
-            {/* 입력폼 */}
-          </ModalBody>
-        </Modal>
-
-      </div>
-    );
-  } // render()
 
 
   /** ------------------------------
@@ -175,9 +120,9 @@ class App extends Component {
    * 모달 ON/OFF
    */
   handleToggle = ()=>{
-    this.setState({
-      toggleModal : !this.state.toggleModal
-    })
+    this.setState(preState => ({
+      toggleModal : !preState.toggleModal
+    }))
     return;
   }
 
@@ -275,14 +220,62 @@ class App extends Component {
    * -------------------------------
    * -
    */
-  _handleRemoveContact = index => {
+  handleRemoveContact = selectedId => {
     if ( !window.confirm('해당 연락처를 삭제하시겠습니까?') ) { 
       return; 
     }
-    const { contact } = this.state;
-    contact.splice(index, 1);
-    this.setState({contact, selectedId:-1});
+    let contact = this.state.contact.filter(c => c.id !== selectedId);
+    this.setState({ contact });
   }
+
+
+  render() {
+    let { 
+      contact, 
+      keyword,
+      selectedId,
+      toggleModal,
+      initData
+    } = this.state
+    
+    // 검색
+    if(keyword){
+      contact = contact.filter(user=>{
+        return user.name.match(keyword) || user.phone.match(keyword);
+      })
+    }
+
+    return (
+      <div>
+        {/* 네비바 */}
+        <Navbar appName="연락처" onCreate={this.handleToggle} />
+
+        {/* 검색바 */}
+        <SearchForm onSearch={this.handleSearch} />
+
+        {/* 리스트 */}
+        <ContactsDetailList data={contact} onRemove={this.handleRemoveContact} />
+          
+
+        {/* 모달 */}
+        <Modal isOpen={toggleModal} toggle={this.handleToggle}>
+          <ModalHeader toggle={this.handleToggle}>연락처</ModalHeader>
+          <ModalBody>
+            {/* 입력폼 */}
+            <InputForm 
+              onCreate={this.handleCreateContact} 
+              onCancel={this.handleToggle}  
+              initData={initData}
+            />
+            {/* 입력폼 */}
+          </ModalBody>
+        </Modal>
+
+      </div>
+    );
+  } // render()
+
+
 
 }// class
 

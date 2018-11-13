@@ -28,17 +28,27 @@ class ContactsDetail extends React.Component {
         this.props.onSelected(selectedId)
     }
 
+    /**
+     * 항목 삭제
+     */
+    handleRemove = selectedId => {
+        this.props.onRemove(selectedId)
+    }
+
     render() {
         const { 
             id, name, phone, belong, img
         } = this.props.info;
         const { display } = this.props;
+        const animateStyle = (display) 
+        ? 'list-group-item d-flex justify-content-between align-items-center selectedItem' 
+        : 'list-group-item d-flex justify-content-between align-items-center';
 
         return (
-            <li>
+            <li >
                 <div 
                     style={{borderBottom:'none'}}
-                    className="list-group-item d-flex justify-content-between align-items-center" 
+                    className={animateStyle}
                     onClick={()=>this.handleSelected(id)}
                 >
                   <span>
@@ -62,20 +72,20 @@ class ContactsDetail extends React.Component {
                     소속: {belong} <br/>   
                     <ButtonGroup style={{width:'100%', marginTop:'5px'}}>
                         <Button 
-                        color="secondary"
-                        size="sm" 
-                        outline
-                        style={{width:'50%'}} 
-                        // onClick={()=>{ this.handleUpdateContact(id) }}
+                            color="secondary"
+                            size="sm" 
+                            outline
+                            style={{width:'50%'}} 
+                            // onClick={()=>{ this.handleUpdateContact(id) }}
                         >
                         수정
                         </Button>
                         <Button 
-                        color="danger"
-                        size="sm" 
-                        outline
-                        style={{width:'50%'}} 
-                        // onClick={()=>{ this._handleRemoveContact(index) }}
+                            color="danger"
+                            size="sm" 
+                            outline
+                            style={{width:'50%'}} 
+                            onClick={()=>{ this.handleRemove(id) }}
                         >
                         삭제
                         </Button>
