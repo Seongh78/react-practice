@@ -79,7 +79,6 @@ class InputForm extends Component {
             phone: '',
             belong: '',
         })
-
     }
 
     /** ------------------------------
