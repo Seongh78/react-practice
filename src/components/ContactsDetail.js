@@ -1,4 +1,8 @@
 import React from 'react'; 
+import { connect } from 'react-redux';
+import { selected } from '../REDUX_actions';
+
+
 // 리액트부트스트랩 컴포넌트
 import { 
     Button,
@@ -17,10 +21,7 @@ class ContactsDetail extends React.Component {
         }
     }
 
-    componentDidMount(){
-        console.log(this.props.display);
-    }
-
+    
     /**
      * 항목 선택
      */
@@ -30,6 +31,13 @@ class ContactsDetail extends React.Component {
 
     /**
      * 항목 삭제
+     */
+    handleRemove = selectedId => {
+        this.props.onRemove(selectedId)
+    }
+
+    /**
+     * 선택
      */
     handleRemove = selectedId => {
         this.props.onRemove(selectedId)
@@ -77,6 +85,7 @@ class ContactsDetail extends React.Component {
                             outline
                             style={{width:'50%'}} 
                             // onClick={()=>{ this.handleUpdateContact(id) }}
+                            onClick={()=>this.props.onSelectedId(id)}
                         >
                         수정
                         </Button>
@@ -97,5 +106,18 @@ class ContactsDetail extends React.Component {
         );
     }// render()
 }
+
+
+
+// 리덕스 액션함수 등록(&맵핑 -> Action의 selected함수를 props의 onSelectedId함수로 맵핑)
+let mapDispatchToProps = (dispatch) => {
+    return {
+        onSelectedId: (id) => dispatch(selected(id))
+    }
+}
+// 컴포넌트에 리덕스 액션 등록
+ContactsDetail = connect(undefined, mapDispatchToProps)(ContactsDetail);
+
+
 
 export default ContactsDetail;

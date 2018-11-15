@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 class Navbar extends Component {
 
@@ -23,7 +24,7 @@ class Navbar extends Component {
         return(
             <nav className="navbar navbar-light bg-light">
                 <a href="/#/" className="navbar-brand">
-                    &nbsp;{appName}
+                    &nbsp;{appName} [redux: {this.props.selectedId}]
                 </a>
                 
                 <form className="form-inline">
@@ -41,5 +42,11 @@ class Navbar extends Component {
         )// return 
     } // render 
 }
+
+let mapStateToProps = state => {
+    return {selectedId: state.selected.selectedId}
+}
+
+Navbar = connect(mapStateToProps)(Navbar);
 
 export default Navbar;

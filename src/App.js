@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-// import Navbar from './layouts/Navbar';
-import { Navbar } from './layouts';
+import { connect } from 'react-redux';
+
+import { Navbar } from './components/layouts';
 import { 
   InputForm,
   ContactsDetailList,
@@ -89,19 +90,18 @@ class App extends Component {
   } // state
 
 
+  // getSnapshotBeforeUpdate(prevProps, prevState) {
+  //   alert(this.props.selectedId)
+  // }
 
-  /** ------------------------------
-   * 클릭 이벤트 
-   * -------------------------------
-   * 선택한 사람의 정보출력
-   */
-  handleClickProfile = index =>{
-    const { selectedId } = this.state;
-    index = index === selectedId ? -1 : index
-    this.setState({
-      selectedId : index
-    })
+  componentDidUpdate() {
+    // alert(this.props.selectedId)
+    const initData = this.state.contact.filter(c=> c.id === this.props.selectedId )[0];
+    console.log(initData);
+    
+    // this.setState({ initData }) // 무한루프생김
   }
+
 
 
   /** ------------------------------
@@ -123,20 +123,7 @@ class App extends Component {
     this.setState(preState => ({
       toggleModal : !preState.toggleModal
     }))
-    return;
   }
-
-
-  /** ------------------------------
-   * 검색 
-   * -------------------------------
-   * 
-   */
-  handleFindUser = e =>{
-    this.setState({
-      keyword: e.target.value
-    })
-  } 
 
 
   /** ------------------------------
@@ -237,6 +224,8 @@ class App extends Component {
       toggleModal,
       initData
     } = this.state
+
+    selectedId = this.props.selectedId;
     
     // 검색
     if(keyword){
@@ -258,14 +247,17 @@ class App extends Component {
           
 
         {/* 모달 */}
-        <Modal isOpen={toggleModal} toggle={this.handleToggle}>
+        <Modal 
+          isOpen={toggleModal} 
+          // toggle={this.handleToggle}
+        >
           <ModalHeader toggle={this.handleToggle}>연락처</ModalHeader>
           <ModalBody>
             {/* 입력폼 */}
             <InputForm 
               onCreate={this.handleCreateContact} 
               onCancel={this.handleToggle}  
-              initData={initData}
+              initData={ (selectedId<0) ? initData : contact[contact.findIndex(c=>c.id===selectedId)] }
             />
             {/* 입력폼 */}
           </ModalBody>
@@ -275,8 +267,15 @@ class App extends Component {
     );
   } // render()
 
-
-
 }// class
+
+
+// 구독
+let mapStateToProps = state => {
+  return { 
+    selectedId: state.selected.selectedId
+  };
+};
+App = connect(mapStateToProps)(App);
 
 export default App;
